@@ -22,8 +22,47 @@ namespace Generic
         public event EventHandler QueueStopped;
 
         public int Delay { get; set; } = 500;
+        public int MaxEventSize { get; set; } = 0;
+        public int Count
+        {
+            get
+            {
+                return BufferQueue.Count;
+            }
+        }
 
 
+        public void EnQueue(T Item)
+        {
+
+            try
+            {
+                BufferQueue.PushRange(new []{Item});
+            }
+            catch (Exception ex)
+            {
+                if (ex != null)
+                {
+                    Exception?.Invoke(ex, null);
+                }
+                return;
+            }
+
+
+            try
+            {
+                StartQueueProcessing();
+
+            }
+            catch (Exception ex)
+            {
+                if (Exception != null)
+                {
+                    Exception(ex, null);
+                }
+            }
+
+        }
         public void EnQueue(List<T> Item)
         {
 
@@ -87,7 +126,11 @@ namespace Generic
                 {
                     if (BufferQueue.Count > 0)
                     {
-                        T[] POP = new T[BufferQueue.Count - 1];
+                        int PopSize = BufferQueue.Count;
+                        if (PopSize > MaxEventSize)
+                            PopSize = MaxEventSize;
+
+                        T[] POP = new T[PopSize];
 
                         BufferQueue.TryPopRange(POP);
 
