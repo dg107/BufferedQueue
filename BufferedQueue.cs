@@ -127,7 +127,7 @@ namespace Generic
                     if (BufferQueue.Count > 0)
                     {
                         int PopSize = BufferQueue.Count;
-                        if (PopSize > MaxEventSize)
+                        if (MaxEventSize > 0) if (PopSize > MaxEventSize)
                             PopSize = MaxEventSize;
 
                         T[] POP = new T[PopSize];
